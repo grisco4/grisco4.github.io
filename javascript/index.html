@@ -111,16 +111,18 @@
   <main class="container py-5">
     <h1 class="display-5 fw-bold mb-4">Aquí aprendrem una mica de Javascript:</h1>
     <p class="lead">En aquesta pàgina farem pràctiques de Javascript.</p>
+    
+<!--botons alerta i canvi-->
     <button onclick="alert('Hola, aquest és un botó d&lsquo;alerta!')">Fes clic</button>
     <p id="text">segueix per aquest boto</p>
-  `<p id="text">Text original</p>\n<button onclick="canvia()">Canvia text</button>`,
-        
-       `function canvia() {\n  document.getElementById('text').innerText = "Text canviat!";\n}`
-      },
+  `<p id="text">Hola</p>\n<button onclick="canvia()">M'en vaix</button>`,
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
+  <script>  
+   <!--botó canvia-->
+    `function canvia() {\n  document.getElementById('text').innerText = "Adeu!";\n}`
+      },
     // Mode clar/fosc amb canvi d'icona
     const themeToggle = document.getElementById('themeToggle');
     const themeIcon = themeToggle.querySelector('i');
