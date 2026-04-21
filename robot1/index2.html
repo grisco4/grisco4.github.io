@@ -1,0 +1,223 @@
+
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reconeixement de Veu amb Anàlisi de Sentiments de gerard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        
+        .sentiment-box {
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .positiu {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .negatiu {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .neutral {
+            background-color: #e2e3e5;
+            color: #383d41;
+        }
+ 
+    /* 1. Submenús en mode fosc */
+    body[data-bs-theme="dark"] .dropdown-menu {
+      background-color: #2c2c2c !important;
+      border-color: #444;
+    }
+    body[data-bs-theme="dark"] .dropdown-item {
+      color: #f8f9fa !important;
+    }
+    body[data-bs-theme="dark"] .dropdown-item:hover,
+    body[data-bs-theme="dark"] .dropdown-item:focus {
+      background-color: #3c3c3c !important;
+      color: #ffffff !important;
+    }
+
+    /* 2. Botó mode fosc/clar només icona */
+    #themeToggle {
+      border: none;
+      background: transparent;
+      font-size: 1.3rem;
+      color: inherit;
+    }
+
+    /* 3. Hamburguesa blanca en mode fosc */
+    .navbar-toggler {
+      border: none;
+    }
+    .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%280,0,0,0.7%29' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    }
+    body[data-bs-theme="dark"] .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255,255,255,0.9%29' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    }
+
+    /* 4. Logo circular i adaptatiu */
+    .logo {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+    }
+    @media (max-width: 576px) {
+      .logo {
+        width: 30px;
+        height: 30px;
+      }
+    }
+    @media (min-width: 992px) {
+      .logo {
+        width: 50px;
+        height: 50px;
+      }
+    }
+  </style>
+
+</head>
+<body>
+
+<h2>Prova de reconeixement de veu</h2>
+<button onclick="start()">Parla</button>
+
+<div class="status" id="estat">Esperant...</div>
+
+<p><strong>Text reconegut:</strong></p>
+<div id="resultat"></div>
+
+<p><strong>Anàlisi de sentiments:</strong></p>
+<div class="sentiment-box neutral" id="sentiment">
+    Esperant text per analitzar...
+</div>
+
+<script>
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const recognition = new SpeechRecognition();
+recognition.lang = "ca-ES";
+
+// DICCIONARI SIMPLIFICAT (només 10 paraules)
+const diccionariSentiments = {
+    // Paraules positives (5 paraules)
+    "bo": 2,
+    "bé": 2,
+    "content": 2,
+    "feliç": 2,
+    "fantàstic": 3,
+    
+    // Paraules negatives (5 paraules)
+    "dolent": -2,
+    "malament": -2,
+    "trist": -2,
+    "horrible": -3,
+    "problema": -1
+};
+
+function analitzarSentiment(text) {
+    const paraules = text.toLowerCase().split(/\s+/);
+    let puntuacio = 0;
+    let paraulesTrobades = [];
+    
+    for (const paraula of paraules) {
+        if (diccionariSentiments.hasOwnProperty(paraula)) {
+            puntuacio += diccionariSentiments[paraula];
+            paraulesTrobades.push({
+                paraula: paraula,
+                valor: diccionariSentiments[paraula]
+            });
+        }
+    }
+    
+    let sentiment = "neutral";
+    let missatge = "Sentiment neutral";
+    
+    if (puntuacio > 2) {
+        sentiment = "positiu";
+        missatge = "😊 Sentiment molt positiu";
+    } else if (puntuacio > 0) {
+        sentiment = "positiu";
+        missatge = "🙂 Sentiment positiu";
+    } else if (puntuacio < -2) {
+        sentiment = "negatiu";
+        missatge = "😠 Sentiment molt negatiu";
+    } else if (puntuacio < 0) {
+        sentiment = "negatiu";
+        missatge = "😐 Sentiment negatiu";
+    }
+    
+    return {
+        sentiment: sentiment,
+        missatge: missatge,
+        puntuacio: puntuacio,
+        paraulesTrobades: paraulesTrobades
+    };
+}
+
+function start() {
+    document.getElementById("estat").innerText = "🎧 Escoltant...";
+    document.getElementById("estat").className = "status";
+    recognition.start();
+}
+
+recognition.onresult = e => {
+    const textReconegut = e.results[0][0].transcript;
+    document.getElementById("estat").innerText = "✅ Veu detectada";
+    document.getElementById("resultat").innerText = textReconegut;
+    
+    // Analitzar sentiment
+    const resultatAnalisi = analitzarSentiment(textReconegut);
+    
+    // Actualitzar visualització de sentiment
+    const elementSentiment = document.getElementById("sentiment");
+    elementSentiment.innerText = resultatAnalisi.missatge + " (Puntuació: " + resultatAnalisi.puntuacio + ")";
+    elementSentiment.className = "sentiment-box " + resultatAnalisi.sentiment;
+    
+    // Mostrar paraules detectades
+    if (resultatAnalisi.paraulesTrobades.length > 0) {
+        let detalls = "Paraules detectades: ";
+        resultatAnalisi.paraulesTrobades.forEach(p => {
+            detalls += p.paraula + "(" + p.valor + ") ";
+        });
+        console.log(detalls);
+    }
+};
+
+recognition.onerror = e => {
+    document.getElementById("estat").innerText = "❌ Error: " + e.error;
+    document.getElementById("estat").className = "status";
+};
+</script>
+
+</body>
+</html>
