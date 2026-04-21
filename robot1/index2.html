@@ -107,7 +107,52 @@
   </style>
 
 </head>
-<body>
+<body data-bs-theme="light">
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light shadow sticky-top">
+    <div class="container-fluid">
+      <!-- 5. Logo i text -->
+      <a class="navbar-brand d-flex align-items-center" href="#">
+        <img src="https://grisco4.github.io/logo.png" alt="Logo" class="logo rounded-circle me-2">
+        <span class="fw-bold">Web d'alumne</span>
+      </a>
+
+      <!-- Botó menú mòbil -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- Menú -->
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <!-- Llenguatges de programació -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="proj1Dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fa-solid fa-diagram-project me-1"></i> Llenguatge de programació
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="proj1Dropdown">
+              <li><a class="dropdown-item" href="https://grisco4.github.io/html"><i class="fa-solid fa-code me-1"></i> HTML</a></li>
+              <li><a class="dropdown-item" href="https://grisco4.github.io/css"><i class="fa-solid fa-brands fa-css me-1"></i> CSS</a></li>
+              <li><a class="dropdown-item" href="https://grisco4.github.io/javascript"><i class="fa-solid fa-database me-1"></i> Javascript</a></li>
+            </ul>
+          </li>
+          <!-- Robot poeta -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="proj2Dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fa-solid fa-folder-open me-1"></i> Robot poeta
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="proj2Dropdown">
+              <li><a class="dropdown-item" href="https://grisco4.github.io/robot1"><i class="fa-solid fa-chart-line me-1"></i> Robot poeta 1</a></li>
+              <li><a class="dropdown-item" href="https://grisco4.github.io/robot2"><i class="fa-solid fa-cogs me-1"></i> Robot poeta 2.2</a></li>
+                  <li><a class="dropdown-item" href="https://grisco4.github.io/robot3"><i class="fa-solid fa-cogs me-1"></i> Robot poeta3</a></li>
+            </ul>
+          </li>
+        </ul>
+        <!-- Botó mode clar/fosc -->
+        <button id="themeToggle" class="ms-2"><i class="fa-solid fa-moon"></i></button>
+      </div>
+    </div>
+  </nav>
 
 <h2>Prova de reconeixement de veu</h2>
 <button onclick="start()">Parla</button>
@@ -218,6 +263,24 @@ recognition.onerror = e => {
     document.getElementById("estat").className = "status";
 };
 </script>
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Mode clar/fosc amb canvi d'icona
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = themeToggle.querySelector('i');
+
+    themeToggle.addEventListener('click', () => {
+      if (document.body.getAttribute('data-bs-theme') === 'dark') {
+        document.body.setAttribute('data-bs-theme', 'light');
+        themeIcon.classList.remove('fa-sun');
+        themeIcon.classList.add('fa-moon');
+      } else {
+        document.body.setAttribute('data-bs-theme', 'dark');
+        themeIcon.classList.remove('fa-moon');
+        themeIcon.classList.add('fa-sun');
+      }
+    });
+  </script>
 
 </body>
 </html>
