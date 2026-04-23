@@ -172,21 +172,23 @@ const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecogni
 const recognition = new SpeechRecognition();
 recognition.lang = "ca-ES";
 
-// DICCIONARI SIMPLIFICAT (només 10 paraules)
+// DICCIONARI SIMPLIFICAT (només 12 paraules)
 const diccionariSentiments = {
-    // Paraules positives (5 paraules)
+    // Paraules positives (6 paraules)
     "bo": 2,
     "bé": 2,
     "content": 2,
     "feliç": 2,
     "fantàstic": 3,
+    "rient":5,
     
-    // Paraules negatives (5 paraules)
+    // Paraules negatives (6 paraules)
     "dolent": -2,
     "malament": -2,
     "trist": -2,
     "horrible": -3,
-    "problema": -1
+    "problema": -1,
+    "malalt":-10
 };
 
 function analitzarSentiment(text) {
@@ -210,9 +212,12 @@ function analitzarSentiment(text) {
     if (puntuacio > 2) {
         sentiment = "positiu";
         missatge = "😊 Sentiment molt positiu";
-    } else if (puntuacio > 0) {
-        sentiment = "positiu";
+       } else if (puntuacio > 0) {
+        sentiment = "fpositiu";
         missatge = "🙂 Sentiment positiu";
+    } else if (puntuacio = 0) {
+        sentiment = "neutral";
+        missatge = "😑 Sentiment neutral";
     } else if (puntuacio < -2) {
         sentiment = "negatiu";
         missatge = "😠 Sentiment molt negatiu";
