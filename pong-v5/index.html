@@ -1,0 +1,407 @@
+
+
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+<title>Pong Pas 5</title>
+
+<script src="https://cdn.jsdelivr.net/npm/p5@2.3.0/lib/p5.min.js"></script>
+
+<style>
+html,body{
+    margin:0;
+    padding:0;
+    overflow:hidden;
+    background:black;
+}
+
+canvas{
+    display:block;
+}
+</style>
+</head>
+<body>
+
+<script>
+
+/*
+====================================================
+PONG PAS 5
+====================================================
+
+NOVETATS
+
+✓ Segona pala amb IA intel·ligent
+✓ La IA comet errors (aleatoris) per ser batible
+✓ Marcador amb punts del jugador i de la IA
+✓ Control adaptat a mòbil i PC
+✓ Reinici de pilota en funció de qui marca
+
+====================================================
+*/
+
+
+/*
+----------------------------------------------------
+PALA DEL JUGADOR (inferior)
+----------------------------------------------------
+*/
+
+let palaJugX;
+let palaJugY;
+
+let ampladaPala = 140;
+let alcadaPala = 20;
+
+
+/*
+----------------------------------------------------
+PALA DE L'ORDINADOR (superior)
+----------------------------------------------------
+*/
+
+let palaIAX;
+let palaIAY;
+
+let velocitatIA = 5;  // velocitat de seguiment
+
+
+/*
+----------------------------------------------------
+PILOTA
+----------------------------------------------------
+*/
+
+let pilotaX;
+let pilotaY;
+
+let velocitatX = 4;
+let velocitatY = 5;
+
+let midaPilota = 25;
+
+
+/*
+----------------------------------------------------
+MARCADOR
+----------------------------------------------------
+*/
+
+let puntsJugador = 0;
+let puntsIA = 0;
+
+
+/*
+----------------------------------------------------
+SETUP
+----------------------------------------------------
+*/
+
+function setup(){
+
+    createCanvas(
+        windowWidth,
+        windowHeight
+    );
+
+    // Posicions verticals de les pales
+    palaJugY = height - 60;   // jugador a baix
+    palaIAY = 60;             // IA a dalt
+
+    // La IA comença al centre
+    palaIAX = width / 2;
+
+    reiniciarPilota();
+}
+
+
+/*
+----------------------------------------------------
+FUNCIÓ PRÒPIA
+Reinicia la pilota al centre amb direcció
+cap avall (1) o cap amunt (-1).
+Si no s'especifica, tria aleatòriament.
+----------------------------------------------------
+*/
+
+function reiniciarPilota(direccio){
+
+    pilotaX = width / 2;
+    pilotaY = height / 3;
+
+    velocitatX = random([-4,4]);
+
+    if(direccio === undefined){
+        // direcció aleatòria
+        direccio = random([1, -1]);
+    }
+
+    // direccio = 1 → cap avall (cap al jugador)
+    // direccio = -1 → cap amunt (cap a l'ordinador)
+    velocitatY = 5 * direccio;
+}
+
+
+/*
+----------------------------------------------------
+DRAW
+----------------------------------------------------
+*/
+
+function draw(){
+
+    background(0);
+
+
+    /*
+    ============================================
+    CONTROL DE LA PALA DEL JUGADOR
+    (ratolí a PC / toc a mòbil)
+    ============================================
+    */
+
+    palaJugX = mouseX;
+
+    palaJugX = constrain(
+        palaJugX,
+        ampladaPala/2,
+        width - ampladaPala/2
+    );
+
+
+    /*
+    ============================================
+    INTEL·LIGÈNCIA ARTIFICIAL
+    (segueix la pilota amb un petit error)
+    ============================================
+    */
+
+    // Destí amb error aleatori (simula imprecisió)
+    let destiX = pilotaX + random(-30, 30);
+
+    // Moviment suau cap al destí
+    if(palaIAX < destiX){
+        palaIAX += velocitatIA;
+    } else if(palaIAX > destiX){
+        palaIAX -= velocitatIA;
+    }
+
+    // Limitar dins de la pantalla
+    palaIAX = constrain(
+        palaIAX,
+        ampladaPala/2,
+        width - ampladaPala/2
+    );
+
+
+    /*
+    ============================================
+    MOVIMENT PILOTA
+    ============================================
+    */
+
+    pilotaX += velocitatX;
+    pilotaY += velocitatY;
+
+    let radi = midaPilota / 2;
+
+
+    /*
+    ============================================
+    REBOT PARETS LATERALS
+    ============================================
+    */
+
+    if(pilotaX - radi <= 0){
+        velocitatX = -velocitatX;
+    }
+
+    if(pilotaX + radi >= width){
+        velocitatX = -velocitatX;
+    }
+
+
+    /*
+    ============================================
+    COL·LISIÓ AMB LA PALA DEL JUGADOR
+    (part inferior)
+    ============================================
+    */
+
+    let tocaAmpladaJug =
+        pilotaX > palaJugX - ampladaPala/2 &&
+        pilotaX < palaJugX + ampladaPala/2;
+
+    let tocaAlturaJug =
+        pilotaY + radi >= palaJugY - alcadaPala/2 &&
+        pilotaY - radi <= palaJugY + alcadaPala/2;
+
+    if(tocaAmpladaJug && tocaAlturaJug && velocitatY > 0){
+        // Rebota cap amunt
+        velocitatY = -velocitatY;
+    }
+
+
+    /*
+    ============================================
+    COL·LISIÓ AMB LA PALA DE L'ORDINADOR
+    (part superior)
+    ============================================
+    */
+
+    let tocaAmpladaIA =
+        pilotaX > palaIAX - ampladaPala/2 &&
+        pilotaX < palaIAX + ampladaPala/2;
+
+    let tocaAlturaIA =
+        pilotaY - radi <= palaIAY + alcadaPala/2 &&
+        pilotaY + radi >= palaIAY - alcadaPala/2;
+
+    if(tocaAmpladaIA && tocaAlturaIA && velocitatY < 0){
+        // Rebota cap avall
+        velocitatY = -velocitatY;
+    }
+
+
+    /*
+    ============================================
+    PUNTS I REINICI
+    ============================================
+    */
+
+    // Gol del jugador (pilota surt per dalt)
+    if(pilotaY - radi < 0){
+        puntsJugador++;
+        reiniciarPilota(1);   // cap al jugador
+    }
+
+    // Gol de l'ordinador (pilota surt per baix)
+    if(pilotaY + radi > height){
+        puntsIA++;
+        reiniciarPilota(-1);  // cap a l'ordinador
+    }
+
+
+    /*
+    ============================================
+    DIBUIXAR PALA DEL JUGADOR
+    ============================================
+    */
+
+    fill(255);
+
+    rectMode(CENTER);
+
+    rect(
+        palaJugX,
+        palaJugY,
+        ampladaPala,
+        alcadaPala
+    );
+
+
+    /*
+    ============================================
+    DIBUIXAR PALA DE L'ORDINADOR
+    ============================================
+    */
+
+    fill(200, 200, 255);  // color lleugerament blau per distingir-la
+
+    rect(
+        palaIAX,
+        palaIAY,
+        ampladaPala,
+        alcadaPala
+    );
+
+
+    /*
+    ============================================
+    DIBUIXAR PILOTA
+    ============================================
+    */
+
+    fill(255);
+    circle(
+        pilotaX,
+        pilotaY,
+        midaPilota
+    );
+
+
+    /*
+    ============================================
+    MARCADOR
+    ============================================
+    */
+
+    fill(255);
+
+    textAlign(CENTER);
+
+    textSize(32);
+
+    // Punts del jugador
+    text(
+        "Tu: " + puntsJugador,
+        width/2 - 60,
+        40
+    );
+
+    // Punts de la IA
+    fill(200, 200, 255);
+    text(
+        "IA: " + puntsIA,
+        width/2 + 60,
+        40
+    );
+
+
+    /*
+    Informació educativa
+    */
+
+    fill(255);
+    textSize(18);
+    text(
+        "Pas 5: IA intel·ligent + Mòbil",
+        width/2,
+        height - 20
+    );
+}
+
+
+/*
+----------------------------------------------------
+ADAPTACIÓ MÒBIL
+----------------------------------------------------
+*/
+
+function windowResized(){
+
+    resizeCanvas(
+        windowWidth,
+        windowHeight
+    );
+
+    palaJugY = height - 60;
+    palaIAY = 60;
+}
+
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
