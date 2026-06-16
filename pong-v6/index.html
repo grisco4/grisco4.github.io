@@ -1,0 +1,445 @@
+
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+<title>Pong Pas 6</title>
+
+<script src="https://cdn.jsdelivr.net/npm/p5@2.3.0/lib/p5.min.js"></script>
+
+<style>
+html,body{
+    margin:0;
+    padding:0;
+    overflow:hidden;
+    background:black;
+}
+canvas{
+    display:block;
+}
+</style>
+</head>
+<body>
+
+<script>
+
+/*
+====================================================
+PONG PAS 6
+====================================================
+
+NOVETATS
+
+✓ Boles verdes (10% en col·lisió amb pala IA) → augmenten amplada pala jugador +10%
+✓ Boles vermelles (25% en col·lisió amb pala IA) → redueixen amplada pala jugador -25%
+✓ Límits d'amplada de pala: entre 50% i 150% de l'original
+✓ Power-ups cauen cap al jugador i s'activen en recollir-los
+✓ La pala del jugador canvia de mida durant la partida
+
+====================================================
+*/
+
+
+/*
+----------------------------------------------------
+PALA DEL JUGADOR (inferior)
+----------------------------------------------------
+*/
+
+let palaJugX;
+let palaJugY;
+
+const AMPLADA_PALA_BASE = 140;   // amplada original (no canvia)
+let ampladaJugActual = AMPLADA_PALA_BASE;  // amplada actual (variable)
+let alcadaPala = 20;
+
+
+/*
+----------------------------------------------------
+PALA DE L'ORDINADOR (superior)
+----------------------------------------------------
+*/
+
+let palaIAX;
+let palaIAY;
+
+let velocitatIA = 5;
+const AMPLADA_PALA_IA = 140;   // la IA sempre té amplada fixa
+
+
+/*
+----------------------------------------------------
+PILOTA
+----------------------------------------------------
+*/
+
+let pilotaX;
+let pilotaY;
+
+let velocitatX = 4;
+let velocitatY = 5;
+
+let midaPilota = 25;
+
+
+/*
+----------------------------------------------------
+MARCADOR
+----------------------------------------------------
+*/
+
+let puntsJugador = 0;
+let puntsIA = 0;
+
+
+/*
+----------------------------------------------------
+POWER-UPS (boles especials)
+----------------------------------------------------
+*/
+
+let powerUps = [];                // llista d'objectes {x, y, tipus}
+const VELOCITAT_POWERUP = 3;     // velocitat de caiguda
+const PROB_VERDA = 0.10;         // 10% en col·lisió amb pala IA
+const PROB_VERMELLA = 0.25;      // 25% en col·lisió amb pala IA
+
+
+/*
+----------------------------------------------------
+SETUP
+----------------------------------------------------
+*/
+
+function setup(){
+    createCanvas(windowWidth, windowHeight);
+
+    palaJugY = height - 60;
+    palaIAY = 60;
+    palaIAX = width / 2;
+
+    ampladaJugActual = AMPLADA_PALA_BASE;   // comença amb mida normal
+
+    reiniciarPilota();
+}
+
+
+/*
+----------------------------------------------------
+Reinicia la pilota al centre
+direcció: 1 (cap avall, jugador) o -1 (cap amunt, IA)
+----------------------------------------------------
+*/
+
+function reiniciarPilota(direccio){
+    pilotaX = width / 2;
+    pilotaY = height / 3;
+
+    velocitatX = random([-4,4]);
+
+    if(direccio === undefined){
+        direccio = random([1, -1]);
+    }
+
+    velocitatY = 5 * direccio;
+}
+
+
+/*
+----------------------------------------------------
+DRAW
+----------------------------------------------------
+*/
+
+function draw(){
+    background(0);
+
+    /*
+    ============================================
+    CONTROL DE LA PALA DEL JUGADOR
+    ============================================
+    */
+
+    palaJugX = mouseX;
+    palaJugX = constrain(
+        palaJugX,
+        ampladaJugActual / 2,
+        width - ampladaJugActual / 2
+    );
+
+
+    /*
+    ============================================
+    INTEL·LIGÈNCIA ARTIFICIAL (pal superior)
+    ============================================
+    */
+
+    let destiX = pilotaX + random(-30, 30);
+    if(palaIAX < destiX){
+        palaIAX += velocitatIA;
+    } else if(palaIAX > destiX){
+        palaIAX -= velocitatIA;
+    }
+    palaIAX = constrain(
+        palaIAX,
+        AMPLADA_PALA_IA / 2,
+        width - AMPLADA_PALA_IA / 2
+    );
+
+
+    /*
+    ============================================
+    MOVIMENT DE LA PILOTA
+    ============================================
+    */
+
+    pilotaX += velocitatX;
+    pilotaY += velocitatY;
+
+    let radi = midaPilota / 2;
+
+
+    /*
+    ============================================
+    REBOT PARETS LATERALS
+    ============================================
+    */
+
+    if(pilotaX - radi <= 0){
+        velocitatX = -velocitatX;
+    }
+    if(pilotaX + radi >= width){
+        velocitatX = -velocitatX;
+    }
+
+
+    /*
+    ============================================
+    COL·LISIÓ AMB LA PALA DEL JUGADOR
+    (ara fa servir l'amplada actual variable)
+    ============================================
+    */
+
+    let tocaAmpladaJug =
+        pilotaX > palaJugX - ampladaJugActual/2 &&
+        pilotaX < palaJugX + ampladaJugActual/2;
+
+    let tocaAlturaJug =
+        pilotaY + radi >= palaJugY - alcadaPala/2 &&
+        pilotaY - radi <= palaJugY + alcadaPala/2;
+
+    if(tocaAmpladaJug && tocaAlturaJug && velocitatY > 0){
+        velocitatY = -velocitatY;
+    }
+
+
+    /*
+    ============================================
+    COL·LISIÓ AMB LA PALA DE L'ORDINADOR
+    + GENERACIÓ DE POWER-UPS
+    ============================================
+    */
+
+    let tocaAmpladaIA =
+        pilotaX > palaIAX - AMPLADA_PALA_IA/2 &&
+        pilotaX < palaIAX + AMPLADA_PALA_IA/2;
+
+    let tocaAlturaIA =
+        pilotaY - radi <= palaIAY + alcadaPala/2 &&
+        pilotaY + radi >= palaIAY - alcadaPala/2;
+
+    if(tocaAmpladaIA && tocaAlturaIA && velocitatY < 0){
+        velocitatY = -velocitatY;
+
+        // === GENERACIÓ DE POWER-UPS ===
+        // Només apareixen quan la pilota toca la pala superior (IA)
+        // i cauen cap avall perquè el jugador els pugui recollir.
+
+        // Bola verda (+10% amplada)
+        if(random() < PROB_VERDA){
+            powerUps.push({
+                x: pilotaX,
+                y: palaIAY + alcadaPala/2 + 15,  // just a sota de la pala de l'IA
+                tipus: 'verd'
+            });
+        }
+
+        // Bola vermella (-25% amplada)
+        if(random() < PROB_VERMELLA){
+            powerUps.push({
+                x: pilotaX,
+                y: palaIAY + alcadaPala/2 + 15,
+                tipus: 'vermell'
+            });
+        }
+    }
+
+
+    /*
+    ============================================
+    PUNTS I REINICI
+    ============================================
+    */
+
+    if(pilotaY - radi < 0){
+        puntsJugador++;
+        reiniciarPilota(1);    // cap al jugador
+    }
+
+    if(pilotaY + radi > height){
+        puntsIA++;
+        reiniciarPilota(-1);   // cap a l'ordinador
+    }
+
+
+    /*
+    ============================================
+    ACTUALITZACIÓ DELS POWER-UPS
+    ============================================
+    */
+
+    // Recorrem la llista en ordre invers per poder eliminar elements
+    for(let i = powerUps.length - 1; i >= 0; i--){
+        let pw = powerUps[i];
+
+        // Moviment cap avall
+        pw.y += VELOCITAT_POWERUP;
+
+        // Comprovem si el jugador l'ha recollit (col·lisió amb la seva pala)
+        let tocaAmpladaPW =
+            pw.x > palaJugX - ampladaJugActual/2 &&
+            pw.x < palaJugX + ampladaJugActual/2;
+
+        let tocaAlturaPW =
+            pw.y + 10 >= palaJugY - alcadaPala/2 &&  // mida del power-up ≈ 20px diàmetre (radi 10)
+            pw.y - 10 <= palaJugY + alcadaPala/2;
+
+        if(tocaAmpladaPW && tocaAlturaPW){
+            // Aplicar efecte
+            if(pw.tipus === 'verd'){
+                ampladaJugActual += AMPLADA_PALA_BASE * 0.10;   // +10% de l'original
+            } else if(pw.tipus === 'vermell'){
+                ampladaJugActual -= AMPLADA_PALA_BASE * 0.25;   // -25% de l'original
+            }
+
+            // Limitar dins del rang [50%, 150%]
+            ampladaJugActual = constrain(
+                ampladaJugActual,
+                AMPLADA_PALA_BASE * 0.5,
+                AMPLADA_PALA_BASE * 1.5
+            );
+
+            // Eliminar el power-up
+            powerUps.splice(i, 1);
+            continue;
+        }
+
+        // Si surt de la pantalla, el fem desaparèixer
+        if(pw.y > height + 20){
+            powerUps.splice(i, 1);
+        }
+    }
+
+
+    /*
+    ============================================
+    DIBUIXAR PALA DE L'ORDINADOR
+    ============================================
+    */
+
+    fill(200, 200, 255);
+    rectMode(CENTER);
+    rect(palaIAX, palaIAY, AMPLADA_PALA_IA, alcadaPala);
+
+
+    /*
+    ============================================
+    DIBUIXAR PALA DEL JUGADOR
+    (amb l'amplada actual)
+    ============================================
+    */
+
+    fill(255);
+    rect(palaJugX, palaJugY, ampladaJugActual, alcadaPala);
+
+
+    /*
+    ============================================
+    DIBUIXAR POWER-UPS
+    ============================================
+    */
+
+    for(let pw of powerUps){
+        if(pw.tipus === 'verd'){
+            fill(0, 255, 0);
+        } else if(pw.tipus === 'vermell'){
+            fill(255, 0, 0);
+        }
+        noStroke();
+        circle(pw.x, pw.y, 20);   // diàmetre 20px
+    }
+
+
+    /*
+    ============================================
+    DIBUIXAR PILOTA
+    ============================================
+    */
+
+    fill(255);
+    circle(pilotaX, pilotaY, midaPilota);
+
+
+    /*
+    ============================================
+    MARCADOR
+    ============================================
+    */
+
+    fill(255);
+    textAlign(CENTER);
+    textSize(32);
+    text("Tu: " + puntsJugador, width/2 - 60, 40);
+
+    fill(200, 200, 255);
+    text("IA: " + puntsIA, width/2 + 60, 40);
+
+    // Mostrem l'amplada actual en percentatge
+    let percent = round((ampladaJugActual / AMPLADA_PALA_BASE) * 100);
+    fill(255);
+    textSize(20);
+    text("Ample pala: " + percent + "%", width/2, height - 40);
+
+    // Informació del pas
+    textSize(16);
+    text("Pas 6: Power-ups (+10% / -25%) – recull les boles", width/2, height - 15);
+}
+
+
+/*
+----------------------------------------------------
+ADAPTACIÓ MÒBIL
+----------------------------------------------------
+*/
+
+function windowResized(){
+    resizeCanvas(windowWidth, windowHeight);
+    palaJugY = height - 60;
+    palaIAY = 60;
+}
+
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
