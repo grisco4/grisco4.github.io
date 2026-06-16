@@ -1,0 +1,15 @@
+<style>
+    /*
+    Eliminem marges perquè el joc ocupi tota la pantalla.
+    */
+    html, body{
+        margin:0;
+        padding:0;
+        overflow:hidden;
+        background:black;
+    }
+
+    canvas{
+        display:block;
+    }
+</style>
