@@ -1,0 +1,276 @@
+
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Pong Pas 2</title>
+
+<script src="https://cdn.jsdelivr.net/npm/p5@2.3.0/lib/p5.min.js"></script>
+
+<style>
+html,body{
+    margin:0;
+    padding:0;
+    overflow:hidden;
+    background:black;
+}
+
+canvas{
+    display:block;
+}
+</style>
+</head>
+<body>
+
+<script>
+
+/*
+====================================================
+PONG PAS 2
+====================================================
+
+NOVETAT:
+Ara afegim una pilota que es mou sola.
+
+Conceptes nous:
+
+1. Posició
+2. Velocitat
+3. Actualització cada fotograma
+
+====================================================
+*/
+
+
+/*
+----------------------------------------------------
+PALA
+----------------------------------------------------
+*/
+
+let palaX;
+let palaY;
+
+let ampladaPala = 120;
+let alcadaPala = 20;
+
+
+/*
+----------------------------------------------------
+PILOTA
+----------------------------------------------------
+
+Necessitem recordar:
+
+- posició X
+- posició Y
+- velocitat X
+- velocitat Y
+- mida
+*/
+
+let pilotaX;
+let pilotaY;
+
+let velocitatX = 4;
+let velocitatY = 3;
+
+let midaPilota = 25;
+
+
+/*
+----------------------------------------------------
+SETUP
+----------------------------------------------------
+*/
+
+function setup(){
+
+    createCanvas(
+        windowWidth,
+        windowHeight
+    );
+
+    /*
+    Posició inicial de la pala
+    */
+
+    palaX = width / 2;
+    palaY = height - 60;
+
+    /*
+    Posició inicial de la pilota
+
+    La posem al centre.
+    */
+
+    pilotaX = width / 2;
+    pilotaY = height / 2;
+}
+
+
+/*
+----------------------------------------------------
+DRAW
+----------------------------------------------------
+*/
+
+function draw(){
+
+    /*
+    Neteja pantalla
+    */
+
+    background(0);
+
+
+    /*
+    ================================================
+    CONTROL DE LA PALA
+    ================================================
+    */
+
+    palaX = mouseX;
+
+    palaX = constrain(
+        palaX,
+        ampladaPala / 2,
+        width - ampladaPala / 2
+    );
+
+
+    /*
+    ================================================
+    MOVIMENT DE LA PILOTA
+    ================================================
+
+    Aquí està la màgia.
+
+    Cada fotograma afegim la velocitat
+    a la posició.
+    */
+
+    pilotaX = pilotaX + velocitatX;
+    pilotaY = pilotaY + velocitatY;
+
+    /*
+    També es pot escriure així:
+
+    pilotaX += velocitatX;
+    pilotaY += velocitatY;
+
+    Significa exactament el mateix.
+    */
+
+
+    /*
+    ================================================
+    DIBUIXAR PALA
+    ================================================
+    */
+
+    rectMode(CENTER);
+
+    fill(255);
+
+    rect(
+        palaX,
+        palaY,
+        ampladaPala,
+        alcadaPala
+    );
+
+
+    /*
+    ================================================
+    DIBUIXAR PILOTA
+    ================================================
+
+    circle(x,y,diametre)
+    */
+
+    circle(
+        pilotaX,
+        pilotaY,
+        midaPilota
+    );
+
+
+    /*
+    ================================================
+    INFORMACIÓ A PANTALLA
+    ================================================
+    */
+
+    fill(255);
+
+    textAlign(CENTER);
+
+    textSize(24);
+
+    text(
+        "Pas 2: La pilota es mou sola",
+        width/2,
+        40
+    );
+
+    textSize(18);
+
+    text(
+        "Velocitat X = " + velocitatX,
+        width/2,
+        70
+    );
+
+    text(
+        "Velocitat Y = " + velocitatY,
+        width/2,
+        95
+    );
+
+    text(
+        "Posició X = " + floor(pilotaX),
+        width/2,
+        120
+    );
+
+    text(
+        "Posició Y = " + floor(pilotaY),
+        width/2,
+        145
+    );
+}
+
+
+/*
+----------------------------------------------------
+ADAPTACIÓ A MÒBIL
+----------------------------------------------------
+*/
+
+function windowResized(){
+
+    resizeCanvas(
+        windowWidth,
+        windowHeight
+    );
+
+    palaY = height - 60;
+}
+
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
