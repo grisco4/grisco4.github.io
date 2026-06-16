@@ -1,0 +1,249 @@
+
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Pong Pas 1</title>
+
+<!--
+Carreguem la llibreria p5.js versió 2.3.0
+Aquesta llibreria ens facilita molt crear jocs i dibuixos.
+-->
+<script src="https://cdn.jsdelivr.net/npm/p5@2.3.0/lib/p5.min.js"></script>
+
+<style>
+    /*
+    Eliminem marges perquè el joc ocupi tota la pantalla.
+    */
+    html, body{
+        margin:0;
+        padding:0;
+        overflow:hidden;
+        background:black;
+    }
+
+    canvas{
+        display:block;
+    }
+</style>
+</head>
+<body>
+
+<script>
+
+/*
+====================================================
+PONG - PAS 1
+====================================================
+
+OBJECTIU:
+Aprendre els conceptes més bàsics:
+
+1. Crear una pantalla.
+2. Dibuixar una pala.
+3. Moure la pala amb el ratolí.
+4. Fer que també funcioni amb el dit al mòbil.
+
+En aquest primer pas encara NO hi ha pilota.
+Només aprendrem a controlar un objecte.
+
+====================================================
+*/
+
+
+/*
+----------------------------------------------------
+VARIABLES
+----------------------------------------------------
+
+Una variable és una caixa on guardem informació.
+
+Necessitem recordar:
+
+- posició X de la pala
+- posició Y de la pala
+- amplada de la pala
+- alçada de la pala
+*/
+
+let palaX;
+let palaY;
+
+let ampladaPala = 120;
+let alcadaPala = 20;
+
+
+/*
+----------------------------------------------------
+setup()
+----------------------------------------------------
+
+Aquesta funció s'executa UNA SOLA VEGADA
+quan comença el joc.
+
+És com preparar el camp abans de jugar.
+*/
+
+function setup() {
+
+    /*
+    Creem un canvas de la mida de la finestra.
+    Això funciona tant a PC com a mòbil.
+    */
+    createCanvas(windowWidth, windowHeight);
+
+    /*
+    Posem la pala al centre horitzontalment.
+    */
+    palaX = width / 2;
+
+    /*
+    Posem la pala prop de la part inferior.
+    */
+    palaY = height - 60;
+}
+
+
+/*
+----------------------------------------------------
+draw()
+----------------------------------------------------
+
+Aquesta funció s'executa moltes vegades
+cada segon (aprox. 60).
+
+És el "motor" del joc.
+*/
+
+function draw() {
+
+    /*
+    Pintem tot el fons de negre.
+
+    Si no ho féssim,
+    els dibuixos antics quedarien visibles.
+    */
+    background(0);
+
+    /*
+    MOURE LA PALA
+    --------------------------------------------
+
+    mouseX és una variable especial de p5.js.
+
+    Conté la posició horitzontal del ratolí.
+
+    En mòbil també segueix el dit.
+    */
+
+    palaX = mouseX;
+
+    /*
+    EVITAR SORTIR DE LA PANTALLA
+    --------------------------------------------
+
+    constrain(valor, minim, maxim)
+
+    Limita un valor dins d'un rang.
+    */
+
+    palaX = constrain(
+        palaX,
+        ampladaPala / 2,
+        width - ampladaPala / 2
+    );
+
+
+
+    /*
+    DIBUIXAR LA PALA
+    --------------------------------------------
+
+    fill(255)
+    color blanc
+    */
+
+    fill(255);
+
+    /*
+    rectMode(CENTER)
+
+    Fa que el rectangle es dibuixi
+    des del centre.
+    */
+    rectMode(CENTER);
+
+    /*
+    rect(x, y, amplada, alcada)
+    */
+    rect(
+        palaX,
+        palaY,
+        ampladaPala,
+        alcadaPala
+    );
+
+
+
+    /*
+    TEXTOS D'AJUDA
+    --------------------------------------------
+    */
+
+    fill(255);
+
+    textAlign(CENTER);
+
+    textSize(24);
+
+    text(
+        "Mou el ratolí o el dit",
+        width / 2,
+        50
+    );
+
+    textSize(18);
+
+    text(
+        "Pas 1: Control de la pala",
+        width / 2,
+        90
+    );
+}
+
+
+/*
+----------------------------------------------------
+windowResized()
+----------------------------------------------------
+
+Si el jugador gira el mòbil o canvia
+la mida de la finestra, adaptem el joc.
+*/
+
+function windowResized() {
+
+    resizeCanvas(
+        windowWidth,
+        windowHeight
+    );
+
+    /*
+    Recol·loquem la pala.
+    */
+    palaY = height - 60;
+}
+
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
