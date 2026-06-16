@@ -1,0 +1,315 @@
+
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Pong Pas 3</title>
+
+<script src="https://cdn.jsdelivr.net/npm/p5@2.3.0/lib/p5.min.js"></script>
+
+<style>
+html,body{
+    margin:0;
+    padding:0;
+    overflow:hidden;
+    background:black;
+}
+
+canvas{
+    display:block;
+}
+</style>
+</head>
+<body>
+
+<script>
+
+/*
+====================================================
+PONG PAS 3
+====================================================
+
+NOVETATS
+
+✓ Pala controlada pel jugador
+✓ Pilota en moviment
+
+NOU:
+
+✓ Rebot a les parets
+
+====================================================
+*/
+
+
+/*
+----------------------------------------------------
+PALA
+----------------------------------------------------
+*/
+
+let palaX;
+let palaY;
+
+let ampladaPala = 120;
+let alcadaPala = 20;
+
+
+/*
+----------------------------------------------------
+PILOTA
+----------------------------------------------------
+*/
+
+let pilotaX;
+let pilotaY;
+
+let velocitatX = 4;
+let velocitatY = 3;
+
+let midaPilota = 25;
+
+
+/*
+----------------------------------------------------
+SETUP
+----------------------------------------------------
+*/
+
+function setup(){
+
+    createCanvas(
+        windowWidth,
+        windowHeight
+    );
+
+    palaX = width / 2;
+    palaY = height - 60;
+
+    pilotaX = width / 2;
+    pilotaY = height / 2;
+}
+
+
+/*
+----------------------------------------------------
+DRAW
+----------------------------------------------------
+*/
+
+function draw(){
+
+    background(0);
+
+    /*
+    ============================================
+    CONTROL DE LA PALA
+    ============================================
+    */
+
+    palaX = mouseX;
+
+    palaX = constrain(
+        palaX,
+        ampladaPala / 2,
+        width - ampladaPala / 2
+    );
+
+
+    /*
+    ============================================
+    MOVIMENT DE LA PILOTA
+    ============================================
+    */
+
+    pilotaX += velocitatX;
+    pilotaY += velocitatY;
+
+
+    /*
+    ============================================
+    REBOT ESQUERRA I DRETA
+    ============================================
+
+    La pilota té radi.
+
+    Si el centre està a X=100
+    i la mida és 20
+
+    el radi és 10.
+    */
+
+    let radi = midaPilota / 2;
+
+
+    /*
+    Paret esquerra
+    */
+
+    if(pilotaX - radi <= 0){
+
+        /*
+        Canviem el signe.
+        */
+
+        velocitatX = -velocitatX;
+    }
+
+
+    /*
+    Paret dreta
+    */
+
+    if(pilotaX + radi >= width){
+
+        velocitatX = -velocitatX;
+    }
+
+
+    /*
+    ============================================
+    REBOT DALT
+    ============================================
+    */
+
+    if(pilotaY - radi <= 0){
+
+        velocitatY = -velocitatY;
+    }
+
+
+    /*
+    ============================================
+    PART INFERIOR
+    ============================================
+
+    Encara NO hi ha rebot amb la pala.
+
+    De moment la fem rebotar també.
+
+    Al pas 4 substituirem això
+    per la col·lisió real amb la pala.
+    */
+
+    if(pilotaY + radi >= height){
+
+        velocitatY = -velocitatY;
+    }
+
+
+    /*
+    ============================================
+    DIBUIXAR PALA
+    ============================================
+    */
+
+    fill(255);
+
+    rectMode(CENTER);
+
+    rect(
+        palaX,
+        palaY,
+        ampladaPala,
+        alcadaPala
+    );
+
+
+    /*
+    ============================================
+    DIBUIXAR PILOTA
+    ============================================
+    */
+
+    circle(
+        pilotaX,
+        pilotaY,
+        midaPilota
+    );
+
+
+    /*
+    ============================================
+    TEXTOS EDUCATIUS
+    ============================================
+    */
+
+    fill(255);
+
+    textAlign(CENTER);
+
+    textSize(24);
+
+    text(
+        "Pas 3: Rebot a les parets",
+        width/2,
+        40
+    );
+
+    textSize(18);
+
+    text(
+        "Velocitat X: " + velocitatX,
+        width/2,
+        75
+    );
+
+    text(
+        "Velocitat Y: " + velocitatY,
+        width/2,
+        100
+    );
+
+
+    /*
+    Mostrem quan va cap a la dreta
+    o cap a l'esquerra.
+    */
+
+    let direccioX;
+
+    if(velocitatX > 0){
+        direccioX = "Dreta ➜";
+    }else{
+        direccioX = "⬅ Esquerra";
+    }
+
+    text(
+        direccioX,
+        width/2,
+        125
+    );
+}
+
+
+/*
+----------------------------------------------------
+CANVI DE MIDA
+----------------------------------------------------
+*/
+
+function windowResized(){
+
+    resizeCanvas(
+        windowWidth,
+        windowHeight
+    );
+
+    palaY = height - 60;
+}
+
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
