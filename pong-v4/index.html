@@ -1,0 +1,345 @@
+
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Pong Pas 4</title>
+
+<script src="https://cdn.jsdelivr.net/npm/p5@2.3.0/lib/p5.min.js"></script>
+
+<style>
+html,body{
+    margin:0;
+    padding:0;
+    overflow:hidden;
+    background:black;
+}
+
+canvas{
+    display:block;
+}
+</style>
+</head>
+<body>
+
+<script>
+
+/*
+====================================================
+PONG PAS 4
+====================================================
+
+NOVETATS
+
+✓ Col·lisió amb la pala
+✓ Marcador
+✓ Reinici de la pilota
+✓ Joc realment jugable
+
+====================================================
+*/
+
+
+/*
+----------------------------------------------------
+PALA
+----------------------------------------------------
+*/
+
+let palaX;
+let palaY;
+
+let ampladaPala = 140;
+let alcadaPala = 20;
+
+
+/*
+----------------------------------------------------
+PILOTA
+----------------------------------------------------
+*/
+
+let pilotaX;
+let pilotaY;
+
+let velocitatX = 4;
+let velocitatY = 5;
+
+let midaPilota = 25;
+
+
+/*
+----------------------------------------------------
+MARCADOR
+----------------------------------------------------
+*/
+
+let punts = 0;
+let errors = 0;
+
+
+/*
+----------------------------------------------------
+SETUP
+----------------------------------------------------
+*/
+
+function setup(){
+
+    createCanvas(
+        windowWidth,
+        windowHeight
+    );
+
+    palaY = height - 60;
+
+    reiniciarPilota();
+}
+
+
+/*
+----------------------------------------------------
+FUNCIÓ PRÒPIA
+
+Aquesta funció la podem cridar
+quan vulguem tornar a començar.
+----------------------------------------------------
+*/
+
+function reiniciarPilota(){
+
+    pilotaX = width / 2;
+    pilotaY = height / 3;
+
+    /*
+    Direcció aleatòria
+    */
+
+    velocitatX = random([-4,4]);
+
+    velocitatY = 5;
+}
+
+
+/*
+----------------------------------------------------
+DRAW
+----------------------------------------------------
+*/
+
+function draw(){
+
+    background(0);
+
+
+    /*
+    ============================================
+    CONTROL DE LA PALA
+    ============================================
+    */
+
+    palaX = mouseX;
+
+    palaX = constrain(
+        palaX,
+        ampladaPala/2,
+        width-ampladaPala/2
+    );
+
+
+    /*
+    ============================================
+    MOVIMENT PILOTA
+    ============================================
+    */
+
+    pilotaX += velocitatX;
+    pilotaY += velocitatY;
+
+
+    let radi = midaPilota / 2;
+
+
+    /*
+    ============================================
+    REBOT PARETS
+    ============================================
+    */
+
+    if(pilotaX - radi <= 0){
+
+        velocitatX = -velocitatX;
+    }
+
+    if(pilotaX + radi >= width){
+
+        velocitatX = -velocitatX;
+    }
+
+    if(pilotaY - radi <= 0){
+
+        velocitatY = -velocitatY;
+    }
+
+
+    /*
+    ============================================
+    COL·LISIÓ AMB LA PALA
+    ============================================
+
+    Comprovem:
+
+    1. La pilota està dins l'amplada
+       de la pala?
+
+    2. Està tocant la seva part superior?
+
+    */
+
+    let tocaAmplada =
+        pilotaX > palaX - ampladaPala/2 &&
+        pilotaX < palaX + ampladaPala/2;
+
+    let tocaAltura =
+        pilotaY + radi >= palaY - alcadaPala/2 &&
+        pilotaY - radi <= palaY + alcadaPala/2;
+
+
+    if(
+        tocaAmplada &&
+        tocaAltura &&
+        velocitatY > 0
+    ){
+
+        /*
+        Rebot
+        */
+
+        velocitatY = -velocitatY;
+
+        /*
+        Punt per al jugador
+        */
+
+        punts++;
+    }
+
+
+    /*
+    ============================================
+    HAS FALLAT?
+    ============================================
+    */
+
+    if(pilotaY - radi > height){
+
+        errors++;
+
+        reiniciarPilota();
+    }
+
+
+    /*
+    ============================================
+    DIBUIXAR PALA
+    ============================================
+    */
+
+    fill(255);
+
+    rectMode(CENTER);
+
+    rect(
+        palaX,
+        palaY,
+        ampladaPala,
+        alcadaPala
+    );
+
+
+    /*
+    ============================================
+    DIBUIXAR PILOTA
+    ============================================
+    */
+
+    circle(
+        pilotaX,
+        pilotaY,
+        midaPilota
+    );
+
+
+    /*
+    ============================================
+    MARCADOR
+    ============================================
+    */
+
+    fill(255);
+
+    textAlign(CENTER);
+
+    textSize(32);
+
+    text(
+        "Punts: " + punts,
+        width/2,
+        50
+    );
+
+    textSize(24);
+
+    text(
+        "Errors: " + errors,
+        width/2,
+        90
+    );
+
+
+    /*
+    Informació educativa
+    */
+
+    textSize(18);
+
+    text(
+        "Pas 4: Col·lisió + Marcador",
+        width/2,
+        130
+    );
+}
+
+
+/*
+----------------------------------------------------
+ADAPTACIÓ MÒBIL
+----------------------------------------------------
+*/
+
+function windowResized(){
+
+    resizeCanvas(
+        windowWidth,
+        windowHeight
+    );
+
+    palaY = height - 60;
+}
+
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
