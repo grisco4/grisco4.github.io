@@ -1,4 +1,4 @@
-<script>
+
 
 /*
 ====================================================
@@ -203,4 +203,4 @@ function windowResized() {
     palaY = height - 60;
 }
 
-</script>
+
